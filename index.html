@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SafeRoad AI | Accident Detection Prototype</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><span class="brand-mark">SR</span><div><strong>SafeRoad AI</strong><small>ROAD SAFETY LAB</small></div></div>
+    <nav>
+      <a class="nav active" href="#overview">▦ <span>Overview</span></a>
+      <a class="nav" href="#monitor">◉ <span>Live Monitor</span></a>
+      <a class="nav" href="#incidents">⚑ <span>Incident History</span></a>
+      <a class="nav" href="#settings">⚙ <span>Notifications</span></a>
+    </nav>
+    <div class="sidebar-bottom"><span class="pulse"></span> Prototype mode <small>Human review required</small></div>
+  </aside>
+
+  <main class="main" id="overview">
+    <header class="topbar">
+      <div><p class="eyebrow">TRAFFIC SAFETY / AI MONITORING</p><h1>Accident Detection Dashboard</h1><p class="muted">Monitor a camera or analyze recorded road footage.</p></div>
+      <div class="status-pill"><span class="pulse"></span><span id="systemStatus">System ready</span></div>
+    </header>
+
+    <div class="notice"><strong>Important:</strong> Vehicle detection and bounding-box overlap do not prove a collision. This prototype records only unverified event candidates; a human must review each event. It does not contact emergency services.</div>
+
+    <section class="metrics">
+      <article class="metric"><div class="metric-icon blue">▣</div><div><p>Detected vehicles</p><h2 id="vehicleCount">0</h2><small>Current frame</small></div></article>
+      <article class="metric"><div class="metric-icon purple">◷</div><div><p>Processing rate</p><h2><span id="fps">0</span> <em>FPS</em></h2><small>Approximate local rate</small></div></article>
+      <article class="metric"><div class="metric-icon orange">⚑</div><div><p>Logged events</p><h2 id="incidentCount">0</h2><small>All statuses</small></div></article>
+      <article class="metric"><div class="metric-icon green">✓</div><div><p>Review status</p><h2 id="unverifiedCount">0</h2><small>Awaiting review</small></div></article>
+    </section>
+
+    <section class="grid" id="monitor">
+      <article class="panel video-panel">
+        <div class="panel-head"><div><h2>Traffic monitor</h2><p class="muted">YOLO vehicle detection overlay</p></div><span class="live-tag" id="sourceTag">STANDBY</span></div>
+        <div class="video-wrap"><img id="videoFeed" src="/video_feed" alt="Processed camera or video stream"><div id="videoPlaceholder" class="video-placeholder"><div class="camera-icon">◉</div><strong>Camera feed is idle</strong><span>Start the webcam or upload a road video.</span></div></div>
+        <div class="controls">
+          <button class="btn primary" id="startCamera">Start webcam</button>
+          <label class="btn secondary file-label" for="videoFile">Choose road video</label>
+          <input type="file" id="videoFile" accept=".mp4,.avi,.mov,.mkv,.webm,video/*">
+          <label class="loop-label"><input type="checkbox" id="loopVideo"> Loop video</label>
+          <button class="btn danger" id="stopSource">Stop</button>
+        </div>
+        <div class="status-line"><span class="pulse"></span><span id="sourceMessage">Ready. Choose a source to begin.</span></div>
+      </article>
+
+      <article class="panel side-panel">
+        <div class="panel-head"><div><h2>Event review</h2><p class="muted">Candidates need human verification</p></div></div>
+        <div class="event-empty" id="candidateStatus"><div class="event-symbol">!</div><strong>No current candidate</strong><span>Possible event indicators will appear here.</span></div>
+        <button class="btn outline full" id="testIncident">Create demo incident</button>
+        <p class="small muted">Use this button to demonstrate the alert workflow without pretending a real crash occurred.</p>
+        <div class="divider"></div>
+        <h3>Detection pipeline</h3>
+        <div class="pipeline"><span class="step-dot done">1</span><div><strong>Vehicle detection</strong><small>Pretrained object detector</small></div></div>
+        <div class="pipeline"><span class="step-dot">2</span><div><strong>Candidate heuristic</strong><small>Repeated bounding-box overlap</small></div></div>
+        <div class="pipeline"><span class="step-dot">3</span><div><strong>Human review</strong><small>Required before confirmation</small></div></div>
+      </article>
+    </section>
+
+    <section class="panel incidents-panel" id="incidents">
+      <div class="panel-head"><div><h2>Incident history</h2><p class="muted">Recent candidate events and test alerts</p></div><button class="btn secondary small-btn" id="refreshIncidents">Refresh</button></div>
+      <div class="table-scroll"><table><thead><tr><th>Event ID</th><th>Time</th><th>Source</th><th>Event</th><th>Score</th><th>Status</th><th>Review</th></tr></thead><tbody id="incidentRows"><tr><td colspan="7" class="empty-cell">Loading events…</td></tr></tbody></table></div>
+    </section>
+
+    <section class="panel settings-panel" id="settings">
+      <div class="panel-head"><div><h2>Test notification</h2><p class="muted">Optional email configuration</p></div><span class="settings-icon">✉</span></div>
+      <p class="muted">The button sends a clearly labelled test email only if you configure SMTP environment variables. Otherwise, it safely reports that no email was sent.</p>
+      <button class="btn secondary" id="testEmail">Send test email</button>
+      <p id="emailMessage" class="small muted"></p>
+    </section>
+    <footer>SafeRoad AI · College project prototype · Not for emergency response</footer>
+  </main>
+  <div id="toast" class="toast" role="status"></div>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
